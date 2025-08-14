@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Are you an idiot?</title>
+<style>
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+    color: white;
+    font-family: sans-serif;
+    flex-direction: column;
+}
+button {
+    font-size: 24px;
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+</style>
+<script>
+const windowCount = 6;
+const width = 345;   // updated window width
+const height = 239;  // updated window height
+const speed = 15;
+
+function spawnWindows() {
+    for (let i = 0; i < windowCount; i++) {
+        let w = window.open("", "idiot" + Date.now() + i, `width=${width},height=${height},left=100,top=100`);
+        if (!w) continue;
+
+        w.document.write(`
+            <html>
+            <head><title>assets/idiot.gif</title></head>
+            <body style="margin:0;overflow:hidden;background:black;">
+                <img src="assets/idiot.gif" style="width:100%;height:100%;object-fit:contain;" />
+                <audio autoplay loop>
+                    <source src="assets/idiot.mp3" type="audio/mpeg">
+                </audio>
+            </body>
+            </html>
+        `);
+
+        let x = Math.random() * (screen.width - width);
+        let y = Math.random() * (screen.height - height);
+        let dx = 15 + Math.random() * 10;
+        let dy = 15 + Math.random() * 10;
+
+        const interval = setInterval(() => {
+            if (w.closed) {
+                clearInterval(interval);
+                return;
+            }
+            if (x + width >= screen.width || x <= 0) dx = -dx;
+            if (y + height >= screen.height || y <= 0) dy = -dy;
+            x += dx;
+            y += dy;
+            w.moveTo(x, y);
+        }, speed);
+    }
+}
+
+function bounceMainWindow() {
+    let x = window.screenX;
+    let y = window.screenY;
+    let dx = 15;
+    let dy = 15;
+
+    setInterval(() => {
+        if (x + window.outerWidth >= screen.width || x <= 0) dx = -dx;
+        if (y + window.outerHeight >= screen.height || y <= 0) dy = -dy;
+        x += dx;
+        y += dy;
+        window.moveTo(x, y);
+    }, speed);
+}
+
+function startChaos() {
+    document.body.innerHTML = `<img src="assets/idiot.gif" style="width:100%;height:100%;object-fit:contain;" /><audio autoplay loop><source src="assets/idiot.mp3" type="audio/mpeg"></audio>`;
+    bounceMainWindow(); // main browser bounce attempt
+
+    spawnWindows(); // spawn immediately
+    setInterval(spawnWindows, 12000); // spawn again every 12 seconds
+}
+
+function exitPage() {
+    document.body.innerHTML = `<h1>Goodbye!</h1>`;
+}
+</script>
+</head>
+<body>
+<h1>Are you an idiot?</h1>
+<div>
+    <button onclick="startChaos()">Yes</button>
+    <button onclick="exitPage()">No</button>
+</div>
+</body>
+</html>
